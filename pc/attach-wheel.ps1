@@ -34,12 +34,12 @@ if ($Detach) {
 if (-not $TvIp) { throw "Falta -TvIp (la IP que muestra la app en la TV)" }
 
 function Find-Wheel {
-    # Ejemplo de salida:
-    #         1-1: Logitech, Inc. : G29 Driving Force Racing Wheel [PS4] (046d:c24f)
+    # Ejemplo de salida (usbip-win2 centra el busid en 11 columnas):
+    #         1-1    : Logitech, Inc. : G29 Driving Force Racing Wheel [PS4] (046d:c24f)
     $lines = & $UsbIp list -r $TvIp 2>&1
     if ($LASTEXITCODE -ne 0) { return $null }
     foreach ($line in $lines) {
-        if ("$line" -match '^\s+(\d+-[\d.]+):.*\(([0-9a-f]{4}):([0-9a-f]{4})\)') {
+        if ("$line" -match '^\s*(\d+-[\d.]+)\s*:.*\(([0-9a-f]{4}):([0-9a-f]{4})\)') {
             if ($BusId) { if ($Matches[1] -eq $BusId) { return $Matches[1] } }
             elseif ($Matches[2] -eq $LogitechVid) { return $Matches[1] }
         }

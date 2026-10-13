@@ -6,3 +6,10 @@ local.properties
 keystore.properties
 *.jks
 *.keystore
+
+# .NET (pc/VolanteUsbIp)
+bin/
+obj/
+
+# Release output (tools/release.ps1)
+dist/

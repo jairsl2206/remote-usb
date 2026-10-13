@@ -22,7 +22,11 @@ de cambiar el arranque, y **no lo desactives mientras el driver esté instalado*
 
 ## 3. Montar el volante
 
-Con la app corriendo en la TV (muestra la IP en pantalla):
+**Con el programa de Windows (recomendado):** abre `VolanteUsbIp-PC-X.Y.Z.exe` (de Releases), escribe
+la IP que muestra la TV y pulsa *Conectar*. Con *Reconectar automáticamente* vuelve a montar el
+volante si se cae, e *Iniciar con Windows* lo deja en la bandeja al arrancar.
+
+**Con PowerShell:**
 
 ```powershell
 .\pc\attach-wheel.ps1 -TvIp 192.168.1.50            # una vez
@@ -37,7 +41,8 @@ usbip.exe list -r 192.168.1.50
 usbip.exe attach -r 192.168.1.50 -b 1-1
 ```
 
-**Auto-reconexión:** deja `-Watch` corriendo mientras juegas. Si el volante se re-enumera, la TV se
+**Auto-reconexión:** `usbip.exe attach` ya reintenta en segundo plano cuando no puede conectar. Con
+el script, deja `-Watch` corriendo mientras juegas. Si el volante se re-enumera, la TV se
 reinicia o se corta la red, el script lo vuelve a montar con el mismo busid. Para que arranque con
 Windows, crea una tarea programada que ejecute
 `powershell -WindowStyle Hidden -File <ruta>\pc\attach-wheel.ps1 -TvIp <IP> -Watch` al iniciar sesión.

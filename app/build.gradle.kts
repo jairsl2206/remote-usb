@@ -5,6 +5,10 @@ plugins {
     kotlin("android")
 }
 
+// Version shared with the Windows exe; tools/release.ps1 passes -PappVersion=X.Y.Z.
+val appVersion = (findProperty("appVersion") as String?) ?: "0.1.0"
+val appVersionCode = appVersion.split('.').map { it.toInt() }.let { (ma, mi, pa) -> ma * 10000 + mi * 100 + pa }
+
 // Release signing (F5): create keystore.properties in the project root (it is git-ignored):
 //   storeFile=release.jks
 //   storePassword=...
@@ -23,8 +27,8 @@ android {
         applicationId = "com.jslsystems.usbip"
         minSdk = 28
         targetSdk = 36
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = appVersionCode
+        versionName = appVersion
     }
 
     signingConfigs {

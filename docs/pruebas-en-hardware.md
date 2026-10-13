@@ -52,7 +52,11 @@ Checklist:
 
 ## APK firmado
 
-1. Crear el keystore (una vez):
+El keystore ya existe (`release.jks` + `keystore.properties` en la raíz, fuera de git) y
+`tools/release.ps1` lo usa para compilar y publicar. Respáldalo. Solo si lo pierdes (en ese caso, hay que
+desinstalar la app de la TV antes de instalar versiones nuevas):
+
+1. Crear un keystore nuevo:
    ```powershell
    keytool -genkeypair -v -keystore release.jks -alias usbip -keyalg RSA -keysize 4096 -validity 10000
    ```
