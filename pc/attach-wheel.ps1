@@ -24,7 +24,8 @@ $LogitechVid = '046d'
 if (-not (Test-Path $UsbIp)) {
     $cmd = Get-Command usbip.exe -ErrorAction SilentlyContinue
     if ($cmd) { $UsbIp = $cmd.Source }
-    else { throw "No encuentro usbip.exe. Instala usbip-win2: winget install --id vadimgrn.usbip-win2 --exact" }
+    # No usar winget: a 2026-10 sigue dando 0.9.7.8, que puede causar pantalla azul.
+    else { throw "No encuentro usbip.exe. Instala la última versión de usbip-win2 (0.9.8.1 o posterior): https://github.com/vadimgrn/usbip-win2/releases/latest" }
 }
 
 if ($Detach) {

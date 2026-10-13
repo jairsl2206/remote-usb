@@ -39,7 +39,8 @@ namespace VolanteUsbIp
         readonly CheckBox startMinimizedBox = new CheckBox { Text = "Abrir minimizado en la bandeja", AutoSize = true };
         readonly TextBox usbipPathBox = new TextBox { Width = 330 };
         readonly Button browseButton = new Button { Text = "…", Width = 32 };
-        readonly LinkLabel installLink = new LinkLabel { Text = "Instalar usbip-win2 (winget)", AutoSize = true };
+        readonly LinkLabel installLink = new LinkLabel { Text = "Instalar usbip-win2", AutoSize = true, Margin = new Padding(3, 7, 3, 3) };
+        readonly CheckBox lowLatencyBox = new CheckBox { Text = "Recepción de baja latencia (usbip-win2 0.9.8 o posterior)", AutoSize = true };
         readonly TextBox logBox = new TextBox
         {
             Multiline = true, ReadOnly = true, ScrollBars = ScrollBars.Vertical, Dock = DockStyle.Fill,
@@ -65,8 +66,8 @@ namespace VolanteUsbIp
             connectButton.Click += async (s, e) => await ConnectAsync();
             disconnectButton.Click += async (s, e) => await DisconnectAsync();
             browseButton.Click += (s, e) => BrowseUsbIp();
-            installLink.LinkClicked += (s, e) => InstallUsbIp();
-            foreach (var c in new Control[] { connectOnStartBox, autoReconnectBox, startMinimizedBox })
+            installLink.LinkClicked += async (s, e) => await InstallUsbIpAsync();
+            foreach (var c in new Control[] { connectOnStartBox, autoReconnectBox, startMinimizedBox, lowLatencyBox })
                 ((CheckBox)c).CheckedChanged += (s, e) => SaveSettings();
             intervalBox.ValueChanged += (s, e) => { SaveSettings(); timer.Interval = (int)intervalBox.Value * 1000; };
             startWithWindowsBox.CheckedChanged += (s, e) => Settings.StartWithWindows = startWithWindowsBox.Checked;
@@ -134,8 +135,10 @@ namespace VolanteUsbIp
             og.SetColumnSpan(startWithWindowsBox, 2);
             og.Controls.Add(startMinimizedBox, 0, 3);
             og.SetColumnSpan(startMinimizedBox, 2);
-            og.Controls.Add(Caption("usbip.exe:"), 0, 4);
-            og.Controls.Add(Row(usbipPathBox, browseButton, installLink), 1, 4);
+            og.Controls.Add(lowLatencyBox, 0, 4);
+            og.SetColumnSpan(lowLatencyBox, 2);
+            og.Controls.Add(Caption("usbip.exe:"), 0, 5);
+            og.Controls.Add(Row(usbipPathBox, browseButton, installLink), 1, 5);
             opts.Controls.Add(og);
             root.Controls.Add(opts);
 
@@ -253,6 +256,7 @@ namespace VolanteUsbIp
             autoReconnectBox.Checked = settings.AutoReconnect;
             intervalBox.Value = Math.Max(1, Math.Min(60, settings.CheckIntervalSeconds));
             startMinimizedBox.Checked = settings.StartMinimized;
+            lowLatencyBox.Checked = settings.LowLatency;
             startWithWindowsBox.Checked = Settings.StartWithWindows;
             usbipPathBox.Text = settings.UsbIpPath;
             deviceBox.Items.Add(AutoDevice);
@@ -278,25 +282,38 @@ namespace VolanteUsbIp
             settings.AutoReconnect = autoReconnectBox.Checked;
             settings.CheckIntervalSeconds = (int)intervalBox.Value;
             settings.StartMinimized = startMinimizedBox.Checked;
+            settings.LowLatency = lowLatencyBox.Checked;
             settings.UsbIpPath = usbipPathBox.Text.Trim();
             try { settings.Save(); }
             catch (Exception ex) { Log("No se pudo guardar la configuración: " + ex.Message); }
         }
 
+        bool missingLogged;
+
+        /// <summary>Looks for usbip.exe; called at start-up and on every tick until it appears.</summary>
         void RefreshCli()
         {
             var path = UsbIpCli.Locate(settings.UsbIpPath);
+            var wasMissing = cli == null;
             cli = path != null ? new UsbIpCli(path) : null;
             installLink.Visible = cli == null;
             if (cli == null)
             {
                 SetState("Falta instalar usbip-win2", Color.Firebrick);
-                Log("No encuentro usbip.exe. Instala usbip-win2 con el enlace de Opciones o indica su ruta.");
+                if (!missingLogged)
+                {
+                    Log("No encuentro usbip.exe. Pulsa \"Instalar usbip-win2\" en Opciones (descarga la última versión de GitHub) o indica su ruta.");
+                    missingLogged = true;
+                }
+                return;
             }
-            else if (string.IsNullOrEmpty(usbipPathBox.Text))
+            if (wasMissing && missingLogged)
             {
-                usbipPathBox.Text = path;
+                Log("usbip-win2 detectado: " + path);
+                SetState("Desconectado", Color.Gray);
             }
+            missingLogged = false;
+            if (string.IsNullOrEmpty(usbipPathBox.Text)) usbipPathBox.Text = path;
         }
 
         void BrowseUsbIp()
@@ -310,10 +327,34 @@ namespace VolanteUsbIp
             }
         }
 
-        void InstallUsbIp()
+        async Task InstallUsbIpAsync()
         {
-            Log("Abriendo winget para instalar usbip-win2… Al terminar, vuelve a esta ventana.");
-            Process.Start(new ProcessStartInfo("cmd.exe", "/k winget install --id vadimgrn.usbip-win2 --exact") { UseShellExecute = true });
+            var answer = MessageBox.Show(this,
+                "Se descargará e instalará la última versión de usbip-win2 desde GitHub (vadimgrn/usbip-win2).\n\n" +
+                "• Windows pedirá permisos de administrador.\n" +
+                "• Durante la instalación se reinician los hubs USB 3.0: teclado, mouse y otros USB se cortan unos segundos.\n" +
+                "• Conviene crear antes un punto de restauración.\n\n¿Continuar?",
+                "Instalar usbip-win2", MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
+            if (answer != DialogResult.OK) return;
+            installLink.Enabled = false;
+            try
+            {
+                var (version, file) = await UsbIpInstaller.DownloadLatestAsync(Log);
+                Log($"Ejecutando el instalador de usbip-win2 {version}…");
+                var code = await UsbIpInstaller.RunAsync(file);
+                Log(code == 0 ? "Instalación terminada." : $"El instalador terminó con código {code}.");
+                RefreshCli();
+            }
+            catch (Exception ex)
+            {
+                Log("No se pudo instalar automáticamente: " + ex.Message);
+                Log("Descárgalo a mano: " + UsbIpInstaller.ReleasesPage);
+                Process.Start(new ProcessStartInfo(UsbIpInstaller.ReleasesPage) { UseShellExecute = true });
+            }
+            finally
+            {
+                installLink.Enabled = true;
+            }
         }
 
         // Hostnames/IPs only: the value ends up on usbip.exe's command line.
@@ -407,6 +448,7 @@ namespace VolanteUsbIp
         /// <summary>Periodic check: shows the state and, if wanted, mounts the wheel again.</summary>
         async Task TickAsync()
         {
+            if (cli == null) RefreshCli();
             if (busy || cli == null) return;
             busy = true;
             try
@@ -456,7 +498,13 @@ namespace VolanteUsbIp
                         return;
                     }
                 }
-                var r = await cli.AttachAsync(host, busId);
+                var r = await cli.AttachAsync(host, busId, lowLatencyBox.Checked);
+                if (!r.Ok && lowLatencyBox.Checked && r.Output.IndexOf("receive-mode", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    Log("Esta versión de usbip-win2 no soporta --receive-mode; desactivo la recepción de baja latencia.");
+                    lowLatencyBox.Checked = false;
+                    r = await cli.AttachAsync(host, busId, false);
+                }
                 if (r.Ok)
                 {
                     Log($"Montado {busId}: {r.Output}");

@@ -154,7 +154,12 @@ namespace VolanteUsbIp
             return list;
         }
 
-        public Task<CliResult> AttachAsync(string host, string busId) => RunAsync($"attach -r {host} -b {busId}");
+        /// <summary>
+        /// Without --once, usbip-win2 keeps retrying in the driver if it cannot connect.
+        /// low-latency (0.9.8+) suits HID devices that send small reports at high frequency.
+        /// </summary>
+        public Task<CliResult> AttachAsync(string host, string busId, bool lowLatency) =>
+            RunAsync($"attach -r {host} -b {busId}" + (lowLatency ? " --receive-mode=low-latency" : ""));
 
         /// <summary>usbip-win2 keeps retrying failed attaches in the driver; this stops it.</summary>
         public Task<CliResult> StopAttemptsAsync(string host, string busId) => RunAsync($"attach -r {host} -b {busId} -x");

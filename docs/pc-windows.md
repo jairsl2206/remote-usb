@@ -5,12 +5,17 @@ conectado por cable.
 
 ## 1. Instalar usbip-win2
 
-```powershell
-winget install --id vadimgrn.usbip-win2 --exact
-```
+Usa el botón **Instalar usbip-win2** del programa de Windows, que descarga la última versión desde
+GitHub, o descárgala a mano de https://github.com/vadimgrn/usbip-win2/releases/latest
+(`USBip-X.Y.Z.W-x64.exe`).
 
-- Requiere Windows 10 1809 o posterior, x64.
-- Usa **la versión más reciente**: versiones anteriores podían causar pantalla azul bajo carga.
+- **No uses winget por ahora:** a octubre de 2026, `winget install vadimgrn.usbip-win2` instala la
+  0.9.7.8, y su autor advierte que esa versión puede corromper memoria y causar pantalla azul. Usa la
+  0.9.8.1 o posterior, que corrige ese error y trae un driver certificado por Microsoft.
+- Requiere Windows 10 1809 o posterior, x64 o arm64.
+- Desde la 0.9.8 existe `--receive-mode=low-latency`, pensado para dispositivos HID que mandan reportes
+  pequeños muy seguido, como un volante. El programa lo usa por defecto (opción *Recepción de baja
+  latencia*).
 - El instalador reinicia los hubs USB 3.0 (todos los USB se cortan un momento). Crea antes un
   punto de restauración.
 

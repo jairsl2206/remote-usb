@@ -66,7 +66,7 @@ app *Downloader*.
 Descarga `VolanteUsbIp-PC-X.Y.Z.exe` de [Releases](https://github.com/jairsl2206/remote-usb/releases) y
 ábrelo. No se instala: usa .NET Framework 4.8, que ya viene con Windows 10/11.
 
-1. Si falta usbip-win2, pulsa *Instalar usbip-win2 (winget)*.
+1. Si falta usbip-win2, pulsa *Instalar usbip-win2*: descarga la última versión de GitHub (0.9.8.1 o posterior). No uses winget: todavía da la 0.9.7.8, que puede causar pantalla azul.
 2. Escribe la IP que muestra la TV, pulsa *Buscar* (opcional) y luego *Conectar*.
 3. Opciones: conectar al abrir, reconexión automática, iniciar con Windows en la bandeja. Al cerrar la
    ventana sigue en la bandeja; *Salir* lo cierra.

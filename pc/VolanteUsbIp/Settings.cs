@@ -17,6 +17,7 @@ namespace VolanteUsbIp
         public bool AutoReconnect { get; set; } = true;
         public int CheckIntervalSeconds { get; set; } = 3;
         public bool StartMinimized { get; set; } = false;
+        public bool LowLatency { get; set; } = true;
         public string UsbIpPath { get; set; } = "";
 
         static string Dir => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "VolanteUsbIp");
