@@ -84,7 +84,8 @@ if ($apksigner) {
 }
 
 $sums = Get-ChildItem $dist -File | ForEach-Object { "{0}  {1}" -f (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLower(), $_.Name }
-$sums | Set-Content -Encoding ascii (Join-Path $dist 'SHA256SUMS.txt')
+# LF line endings so 'sha256sum -c SHA256SUMS.txt' works as-is on Linux/Git Bash.
+[IO.File]::WriteAllText((Join-Path $dist 'SHA256SUMS.txt'), (($sums -join "`n") + "`n"))
 Get-ChildItem $dist | Format-Table Name, Length -AutoSize
 
 if ($NoPublish) { Write-Host "Listo (sin publicar): $dist"; return }
