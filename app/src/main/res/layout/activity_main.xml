@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg"
+    android:baselineAligned="false"
+    android:orientation="horizontal"
+    android:padding="32dp">
+
+    <!-- Left column: status and actions (D-pad focus starts here). -->
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:paddingEnd="24dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/app_name"
+                android:textColor="@color/text"
+                android:textSize="28sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textColor="@color/accent"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/toggle_server"
+                style="@style/TvButton"
+                android:layout_marginTop="20dp" />
+
+            <Button
+                android:id="@+id/request_permission"
+                style="@style/TvButton"
+                android:text="@string/request_permission" />
+
+            <Button
+                android:id="@+id/autostart"
+                style="@style/TvButton" />
+
+            <Button
+                android:id="@+id/debug_log"
+                style="@style/TvButton"
+                android:nextFocusRight="@id/log_scroll" />
+
+            <TextView
+                style="@style/SectionTitle"
+                android:text="@string/devices_title" />
+
+            <TextView
+                android:id="@+id/devices"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text"
+                android:textSize="15sp" />
+
+            <TextView
+                style="@style/SectionTitle"
+                android:text="@string/sessions_title" />
+
+            <TextView
+                android:id="@+id/sessions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text"
+                android:textSize="14sp" />
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Right column: event log, scrollable with the D-pad once focused. -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            style="@style/SectionTitle"
+            android:layout_marginTop="0dp"
+            android:text="@string/log_title" />
+
+        <ScrollView
+            android:id="@+id/log_scroll"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/log_bg"
+            android:focusable="true"
+            android:nextFocusLeft="@id/toggle_server"
+            android:padding="12dp">
+
+            <TextView
+                android:id="@+id/log"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="monospace"
+                android:textColor="@color/text"
+                android:textSize="13sp" />
+        </ScrollView>
+    </LinearLayout>
+</LinearLayout>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Volante USB/IP</string>
+    <string name="channel_name">Servidor USB/IP</string>
+    <string name="notification_title">Servidor USB/IP activo</string>
+    <string name="notification_idle">Esperando a la PC en el puerto 3240</string>
+    <string name="status_running">Servidor activo · %1$s · puerto %2$d</string>
+    <string name="status_stopped">Servidor detenido</string>
+    <string name="start_server">Iniciar servidor</string>
+    <string name="stop_server">Detener servidor</string>
+    <string name="request_permission">Pedir permiso USB</string>
+    <string name="autostart">Iniciar al encender: %1$s</string>
+    <string name="debug_log">Registro detallado: %1$s</string>
+    <string name="yes">sí</string>
+    <string name="no">no</string>
+    <string name="devices_title">Dispositivos USB</string>
+    <string name="sessions_title">PC conectada</string>
+    <string name="log_title">Eventos</string>
+    <string name="no_devices">No hay dispositivos USB conectados</string>
+    <string name="no_sessions">Ninguna PC ha montado un dispositivo</string>
+</resources>

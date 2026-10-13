@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Logitech (0x046D). Matches every wheel model and both modes (PS3/PS4/Xbox). -->
+    <usb-device vendor-id="1133" />
+</resources>
